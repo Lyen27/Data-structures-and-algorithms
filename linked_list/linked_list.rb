@@ -8,8 +8,9 @@ class LinkedList
     if @head.nil?
       @head = @tail = Node.new(value, nil, 0)
     else
-      current_node = iterate
+      current_node = @tail
       current_node.next_node = Node.new(value, nil, current_node.index + 1)
+      @tail = current_node.next_node
     end
   end
 
@@ -31,13 +32,21 @@ class LinkedList
       @head = @tail = nil
     else
       iterate do |node|
-        penultimate_index = size - 2
-        if node.index == penultimate_index
+        if node.next_node == @tail
           node.next_node = nil
+          @tail = node
           break
         end
       end
     end
+  end
+
+  def insert_at(value, index)
+    
+  end
+
+  def remove_at(index)
+    
   end
 
   def contains?(value)
@@ -76,16 +85,13 @@ class LinkedList
   end
 
   def tail
-    return if @tail.nil?
-
-    last_node = iterate
-    last_node.value
+   @tail.value unless @tail.nil?
   end
 
   def size
     return nil if @head.nil?
 
-    iterate.index + 1
+    @tail.index + 1
   end
 
   def to_s
@@ -104,7 +110,6 @@ class LinkedList
       current_node = current_node.next_node
     end
     yield(current_node) if block_given?
-    current_node
   end
 end
 
