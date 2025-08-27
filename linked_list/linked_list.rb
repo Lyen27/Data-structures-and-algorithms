@@ -2,28 +2,25 @@ class LinkedList
   def initialize
     @head = nil
     @tail = nil
+    @size = 0
   end
 
   def append(value)
     if @head.nil?
-      @head = @tail = Node.new(value, nil, 0)
+      @head = @tail = Node.new(value, nil)
     else
       current_node = @tail
-      current_node.next_node = Node.new(value, nil, current_node.index + 1)
+      current_node.next_node = Node.new(value, nil)
       @tail = current_node.next_node
     end
   end
 
   def prepend(value)
     if @head.nil?
-      @head = @tail = Node.new(value, nil, 0)
+      @head = @tail = Node.new(value, nil)
     else
-      current_node = Node.new(value, @head, 0)
+      current_node = Node.new(value, @head)
       @head = current_node
-      iterate do |node|
-        next if node == @head
-        node.index += 1
-      end
     end
   end
 
@@ -42,11 +39,30 @@ class LinkedList
   end
 
   def insert_at(value, index)
-    
+    unless @head.nil?
+      counter = 0
+      iterate do |node|
+        if counter == index - 1
+          successor = node.next_node
+          node.next_node = Node.new(value, successor)
+          return
+        end
+        counter += 1
+      end
+    end
   end
 
   def remove_at(index)
-    
+    unless @head.nil?
+      counter = 0
+      iterate do |node|
+        if counter == index - 1
+          node.next_node = node.next_node.next_node
+          return
+        end
+        counter += 1
+      end
+    end
   end
 
   def contains?(value)
@@ -60,24 +76,25 @@ class LinkedList
 
   def find(value)
     unless @head.nil?
+      index = 0
       iterate do |node|
-        return node.index if node.value == value
+        break if node.value == value
+        index += 1
       end
+      return nil if index == size
+      index
     end
-    nil
   end
 
   def at(index)
     return if @head.nil?
 
-    index_value = nil
+    counter = 0
     iterate do |node|
-      if node.index == index
-        index_value = node.value
-        break
-      end
+      return node.value if counter == index
+      counter += 1
     end
-    index_value
+    nil if counter == size
   end
 
   def head
@@ -89,9 +106,11 @@ class LinkedList
   end
 
   def size
-    return nil if @head.nil?
+    return 0 if @head.nil?
 
-    @tail.index + 1
+    iterate do |node|
+      @size += 1
+    end
   end
 
   def to_s
@@ -114,11 +133,10 @@ class LinkedList
 end
 
 class Node
-  attr_accessor :value, :next_node, :index
+  attr_accessor :value, :next_node
 
-  def initialize(value, next_node, index)
+  def initialize(value, next_node)
     @value = value
-    @index = index
     @next_node = next_node
   end
 end
