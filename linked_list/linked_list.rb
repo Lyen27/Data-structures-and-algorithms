@@ -39,7 +39,7 @@ class LinkedList
   end
 
   def insert_at(value, index)
-    unless @head.nil?
+    unless @head.nil? || index >= size || index < 0
       counter = 0
       iterate do |node|
         if counter == index - 1
@@ -53,10 +53,14 @@ class LinkedList
   end
 
   def remove_at(index)
-    unless @head.nil?
+    unless @head.nil? || index >= size || index < 0
       counter = 0
       iterate do |node|
-        if counter == index - 1
+        if index == 0
+          @head = @head.next_node
+          return
+        elsif counter == index - 1
+          @tail = node if node.next_node == @tail
           node.next_node = node.next_node.next_node
           return
         end
