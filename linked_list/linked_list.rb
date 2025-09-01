@@ -68,6 +68,18 @@ class LinkedList
       end
     end
   end
+  
+  def filter
+    index = 0
+    iterate do |node|
+      if yield(node.value)
+        remove_at(index)
+        return node.value
+      end
+      index += 1
+    end
+    nil
+  end
 
   def contains?(value)
     return if @head.nil?
