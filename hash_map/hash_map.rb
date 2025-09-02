@@ -21,12 +21,6 @@ class HashMap
   def set(key,value)
     size_limit = @load_factor * @capacity
 
-    @length += 1
-
-    if @length > size_limit
-      grow_buckets
-    end
-
     hashed_key = hash(key)
     index = hashed_key % @capacity
     raise IndexError if index.negative? || index >= @buckets.length
@@ -40,10 +34,17 @@ class HashMap
           is_equal = true
         end 
       end 
-      @buckets[index].append([key,value]) if is_equal == false
+      if is_equal == false
+        @buckets[index].append([key,value])
+        @length += 1
+      end
     else 
       @buckets[index] = LinkedList.new
       @buckets[index].append([key,value])
+      @length += 1
+    end
+    if @length > size_limit
+      grow_buckets
     end
   end
   
@@ -81,11 +82,8 @@ class HashMap
   end
 
   def clear
-    @buckets.each_index do |index|
-      next if @buckets[index].nil?
-      @buckets[index] = nil
-      @length = 0
-    end
+   @buckets = Array.new(@capacity)
+   @length = 0
   end
 
   def keys
@@ -140,6 +138,3 @@ class HashMap
     @buckets = new_array
   end
 end
-
- 
-
