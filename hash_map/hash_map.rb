@@ -1,12 +1,12 @@
 require_relative '../linked_list/linked_list'
 
 class HashMap
-  attr_accessor :buckets, :size
+  attr_accessor :buckets, :length
   def initialize
     @load_factor = 0.75
     @capacity = 16
     @buckets = Array.new(@capacity)
-    @size = 0  
+    @length = 0  
   end
 
   def hash(key)
@@ -21,9 +21,9 @@ class HashMap
   def set(key,value)
     size_limit = @load_factor * @capacity
 
-    @size += 1
+    @length += 1
 
-    if @size > size_limit
+    if @length > size_limit
       grow_buckets
     end
 
@@ -50,10 +50,75 @@ class HashMap
   def get(key)
     hashed_key = hash(key)
     index = hashed_key % @capacity
-
-    @buckets[index].iterate do |node|
-      return node.value[1] if node.value[0] == key
+    raise IndexError if index.negative? || index >= @buckets.length
+    if @buckets[index] != nil
+      @buckets[index].iterate do |node|
+       return node.value[1] if node.value[0] == key
+      end
     end
+  end
+
+  def has?(key)
+    @buckets.each do |bucket|
+      next if bucket.nil?
+      bucket.iterate do |node|
+        return true if node.value[0] == key
+      end
+    end
+    false
+  end
+
+  def remove(key)
+    @buckets.each do |bucket|
+      next if bucket.nil?
+      deleted_entry = bucket.filter {|value| value[0] == key}
+      unless deleted_entry.nil?
+        @length -= 1
+        return deleted_entry
+      end
+    end
+    nil
+  end
+
+  def clear
+    @buckets.each_index do |index|
+      next if @buckets[index].nil?
+      @buckets[index] = nil
+      @length = 0
+    end
+  end
+
+  def keys
+    keys = []
+    @buckets.each do |bucket|
+      next if bucket.nil?
+      bucket.iterate do |node|
+        keys << node.value[0]
+      end
+    end
+    keys
+  end
+
+  def values
+    values = []
+    @buckets.each do |bucket|
+      next if bucket.nil?
+      bucket.iterate do |node|
+        values << node.value[1]
+      end
+    end
+    values
+  end
+
+  def entries
+    entries = []
+    @buckets.each do |bucket|
+      next if bucket.nil?
+      bucket.iterate do |node|
+        entries << node.value
+      end
+    end
+    entries
   end
 
   def grow_buckets
@@ -76,20 +141,5 @@ class HashMap
   end
 end
 
-test = HashMap.new
-
- test.set('apple', 'red')
- test.set('banana', 'yellow')
- test.set('carrot', 'orange')
- test.set('dog', 'brown')
- test.set('elephant', 'gray')
- test.set('frog', 'green')
- test.set('grape', 'purple')
- test.set('hat', 'black')
- test.set('ice cream', 'white')
- test.set('jacket', 'blue')
- test.set('kite', 'pink')
- test.set('lion', 'golden')
- 
  
 
