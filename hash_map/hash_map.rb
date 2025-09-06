@@ -82,6 +82,7 @@ class HashMap
   end
 
   def clear
+   @capacity = 16
    @buckets = Array.new(@capacity)
    @length = 0
   end
