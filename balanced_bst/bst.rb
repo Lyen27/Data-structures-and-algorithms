@@ -112,6 +112,72 @@ class Tree
     end
   end
 
+  def level_order
+    queue = [@root]
+    arr = []
+    until queue.empty?
+      current_node = queue.shift
+      queue << current_node.left_child unless current_node.left_child.nil?
+      queue << current_node.right_child unless current_node.right_child.nil?
+      if block_given?
+        yield(current_node)
+      else
+        arr << current_node.value 
+      end
+    end
+    arr unless block_given?
+  end
+
+  def recursive_level_order(queue = [@root],arr = [],&block)
+    current_node = queue.shift
+    queue << current_node.left_child unless current_node.left_child.nil?
+    queue << current_node.right_child unless current_node.right_child.nil?
+    yield(current_node) if block_given?
+    arr << current_node.value
+    if queue.empty?
+      return arr unless block_given?
+      return
+    end
+    recursive_level_order(queue,arr,&block)
+  end
+
+  def inorder(current_node = @root,arr = [],&block)
+    return if current_node.nil?
+
+    inorder(current_node.left_child,arr,&block)
+    if block_given?
+      yield(current_node)
+    else
+      arr << current_node.value
+    end
+    inorder(current_node.right_child,arr,&block)
+    arr unless block_given?
+  end
+
+  def preorder(current_node = @root,arr = [],&block)
+    return if current_node.nil?
+    if block_given?
+      yield(current_node)
+    else
+      arr << current_node.value
+    end
+    preorder(current_node.left_child,arr,&block)
+    preorder(current_node.right_child,arr,&block)
+    arr unless block_given?
+  end
+
+  def postorder(current_node = @root, arr = [], &block)
+    return if current_node.nil?
+    postorder(current_node.left_child,arr,&block)
+    postorder(current_node.right_child,arr,&block)
+    if block_given?
+      yield(current_node)
+    else
+      arr << current_node.value
+    end
+    arr unless block_given?
+  end
+
   def find(value)
     current_node = @root
     
@@ -141,6 +207,13 @@ class Tree
   end
 end
 
-test = Tree.new([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15])
+test = Tree.new([1,2,3,4,5,6,7,8,9,10])
 
 test.pretty_print
+p test.level_order
+
+p test.inorder
+
+p test.preorder
+
+p test.postorder
