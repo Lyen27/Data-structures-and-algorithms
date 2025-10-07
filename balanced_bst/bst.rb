@@ -178,6 +178,71 @@ class Tree
     arr unless block_given?
   end
 
+  def height(node,first_call = true)
+    if first_call
+      node = find(node)
+      return nil if node.nil?
+    end
+    return -1 if node.nil?
+
+    left_height = height(node.left_child,false) 
+    right_height = height(node.right_child,false) 
+
+    if left_height >= right_height
+      left_height + 1
+    else
+      right_height + 1
+    end
+  end
+  
+  def depth(value)
+    current_node = @root
+
+    counter = 0
+
+    until current_node.value == value
+      if value < current_node.value
+        current_node = current_node.left_child
+      else
+        current_node = current_node.right_child
+      end
+      counter += 1
+      return if current_node.nil?
+    end
+    counter
+  end
+
+  def balanced?(node = @root,first_call = true)
+    
+    return -1 if node.nil?
+
+    left_height = balanced?(node.left_child,false)
+    right_height = balanced?(node.right_child,false)
+
+    if left_height == false || right_height == false
+      return false
+    end
+    
+    difference = (left_height - right_height).abs
+    if difference > 1
+      return false
+    end
+     
+    return true if first_call
+
+    if left_height >= right_height
+      left_height + 1
+    else
+      right_height + 1
+    end
+  end
+
+  def rebalance
+    unless balanced?
+      @root = build_tree(inorder)
+    end
+  end
+
   def find(value)
     current_node = @root
     
@@ -207,13 +272,29 @@ class Tree
   end
 end
 
-test = Tree.new([1,2,3,4,5,6,7,8,9,10])
+test = Tree.new(Array.new(15) { rand(1..100) })
 
 test.pretty_print
+p test.balanced?
 p test.level_order
-
-p test.inorder
-
 p test.preorder
-
+p test.inorder
 p test.postorder
+
+test.insert(101)
+test.insert(150)
+test.insert(200)
+test.insert(250)
+
+test.pretty_print
+p test.balanced?
+test.rebalance
+test.pretty_print
+p test.balanced?
+
+p test.level_order
+p test.preorder
+p test.inorder
+p test.postorder
+
+
