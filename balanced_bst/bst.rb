@@ -31,7 +31,7 @@ class Tree
     end
     middle_index = (arr.length - 1) / 2
     left = arr[0...middle_index]
-    right = arr[(middle_index + 1)..arr.last]
+    right = arr[(middle_index + 1)..-1]
     node = Node.new(arr[middle_index],build_tree(left),build_tree(right))
     return node
   end
